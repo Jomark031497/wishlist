@@ -8,7 +8,9 @@
     "start": "node --env-file=.env dist/index.js",
     "dev": "tsx watch --env-file=.env src/index.ts",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "db:push": "drizzle-kit push:pg",
+    "db:studio": "drizzle-kit studio --port 6969 --host 127.0.0.1"
   },
   "keywords": [
     "node",
@@ -22,6 +24,7 @@
     "@types/node": "^20.10.5",
     "@typescript-eslint/eslint-plugin": "^6.15.0",
     "@typescript-eslint/parser": "^6.15.0",
+    "drizzle-kit": "^0.20.7",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "prettier": "^3.1.1",
@@ -30,9 +33,11 @@
   },
   "dependencies": {
     "date-fns": "^3.0.6",
+    "drizzle-orm": "^0.29.1",
     "express": "^4.18.2",
     "pino": "^8.17.1",
-    "pino-pretty": "^10.3.0"
+    "pino-pretty": "^10.3.0",
+    "postgres": "^3.4.3"
   },
   "engines": {
     "node": ">=20.0.0"
