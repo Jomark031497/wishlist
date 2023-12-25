@@ -5,3 +5,5 @@ export const usersRoutes = Router()
 
 usersRoutes.get('/', usersController.getUsersHandler)
 usersRoutes.get('/:id', usersController.getUserByIdHandler)
+
+usersRoutes.post('/', usersController.createUserHandler)
