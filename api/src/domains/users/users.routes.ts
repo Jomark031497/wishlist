@@ -1,10 +1,7 @@
 import { Router } from 'express'
-import { createUserHandler, getAuthenticatedUserHandler, signInUserHandler } from './users.controller.js'
+import * as usersController from './users.controller.js'
 
 export const usersRoutes = Router()
 
-usersRoutes.get('/me', getAuthenticatedUserHandler)
-
-usersRoutes.post('/register', createUserHandler)
-
-usersRoutes.post('/login', signInUserHandler)
+usersRoutes.get('/', usersController.getUsersHandler)
+usersRoutes.get('/:id', usersController.getUserByIdHandler)
