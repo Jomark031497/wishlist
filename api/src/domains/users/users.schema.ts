@@ -7,18 +7,20 @@ export const user = pgTable('auth_user', {
     .$defaultFn(() => nanoid())
     .primaryKey()
     .notNull(),
-  username: varchar('username', { length: 150 }).unique().notNull(),
+  email: varchar('email', { length: 150 }).unique().notNull(),
   password: varchar('password', { length: 150 }).notNull(),
 })
 
 export type User = typeof user.$inferSelect
 export type NewUser = typeof user.$inferInsert
 
-// Schema for inserting a user - can be used to validate API requests
-export const insertUserSchema = createInsertSchema(user)
-
 // Schema for selecting a user - can be used to validate API responses
 export const selectUserSchema = createSelectSchema(user)
+
+// Schema for inserting a user - can be used to validate API requests
+export const insertUserSchema = createInsertSchema(user, {
+  email: (schema) => schema.email.email('Please enter a valid email address'),
+})
 
 export const session = pgTable('user_session', {
   id: varchar('id', {
