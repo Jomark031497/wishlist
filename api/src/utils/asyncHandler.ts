@@ -4,7 +4,7 @@ export function asyncHandler<T>(asyncFn: (req: Request, res: Response, next: Nex
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
       const result = await asyncFn(req, res, next)
-      return res.json(result)
+      return result
     } catch (error) {
       return next(error)
     }

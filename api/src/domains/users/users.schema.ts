@@ -1,54 +1,22 @@
-import { pgTable, bigint, varchar } from 'drizzle-orm/pg-core'
-import { nanoid } from 'nanoid'
+import { pgTable, varchar } from 'drizzle-orm/pg-core'
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
+import { nanoid } from 'nanoid'
 
-export const user = pgTable('auth_user', {
+export const users = pgTable('users', {
   id: varchar('id')
     .$defaultFn(() => nanoid())
     .primaryKey()
     .notNull(),
-  email: varchar('email', { length: 150 }).unique().notNull(),
+  email: varchar('email', { length: 255 }).notNull().unique(),
   password: varchar('password', { length: 150 }).notNull(),
+  fullName: varchar('full_name', { length: 255 }),
 })
 
-export type User = typeof user.$inferSelect
-export type NewUser = typeof user.$inferInsert
-
-// Schema for selecting a user - can be used to validate API responses
-export const selectUserSchema = createSelectSchema(user)
+export type User = typeof users.$inferSelect // return type when queried
+export type NewUser = typeof users.$inferInsert // insert type
 
 // Schema for inserting a user - can be used to validate API requests
-export const insertUserSchema = createInsertSchema(user, {
-  email: (schema) => schema.email.email('Please enter a valid email address'),
-})
+export const insertUserSchema = createInsertSchema(users)
 
-export const session = pgTable('user_session', {
-  id: varchar('id', {
-    length: 128,
-  }).primaryKey(),
-  userId: varchar('user_id', {
-    length: 15,
-  })
-    .notNull()
-    .references(() => user.id),
-  activeExpires: bigint('active_expires', {
-    mode: 'number',
-  }).notNull(),
-  idleExpires: bigint('idle_expires', {
-    mode: 'number',
-  }).notNull(),
-})
-
-export const key = pgTable('user_key', {
-  id: varchar('id', {
-    length: 255,
-  }).primaryKey(),
-  userId: varchar('user_id', {
-    length: 15,
-  })
-    .notNull()
-    .references(() => user.id),
-  hashedPassword: varchar('hashed_password', {
-    length: 255,
-  }),
-})
+// Schema for selecting a user - can be used to validate API responses
+export const selectUserSchema = createSelectSchema(users)
