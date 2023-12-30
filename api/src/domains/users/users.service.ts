@@ -5,37 +5,17 @@ import { ApiError } from '../../utils/ApiError.js'
 import { hash } from 'argon2'
 
 export const getAllUsers = async () => {
-  const query = await db
-    .select({
-      id: users.id,
-      email: users.email,
-      fullName: users.fullName,
-    })
-    .from(users)
+  const query = await db.select().from(users)
   return query
 }
 
 export const getUserById = async (id: User['id']) => {
-  const query = await db
-    .select({
-      id: users.id,
-      email: users.email,
-      fullName: users.fullName,
-    })
-    .from(users)
-    .where(eq(users.id, id))
+  const query = await db.select().from(users).where(eq(users.id, id))
   return query[0]
 }
 
 export const getUserByEmail = async (email: User['email']) => {
-  const query = await db
-    .select({
-      id: users.id,
-      email: users.email,
-      fullName: users.fullName,
-    })
-    .from(users)
-    .where(eq(users.email, email))
+  const query = await db.select().from(users).where(eq(users.email, email))
   return query[0]
 }
 
@@ -45,32 +25,21 @@ export const createUser = async (payload: NewUser) => {
 
   const hashedPassword = await hash(payload.password)
 
-  const query = await db
-    .insert(users)
-    .values({ ...payload, password: hashedPassword })
-    .returning({
-      id: users.id,
-      email: users.email,
-    })
+  await db.insert(users).values({ ...payload, password: hashedPassword })
 
-  return query[0]
+  return { success: true }
 }
 
 export const updateUser = async (id: User['id'], payload: NewUser) => {
   const user = await getUserById(id)
   if (!user) throw new ApiError(400, 'User not found')
 
-  const query = await db
+  await db
     .update(users)
     .set({ ...user, ...payload })
     .where(eq(users.id, user.id))
-    .returning({
-      id: users.id,
-      email: users.email,
-      fullName: users.fullName,
-    })
 
-  return query[0]
+  return { success: true }
 }
 
 export const deleteUser = async (id: User['id']) => {
