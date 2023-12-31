@@ -1,9 +1,13 @@
 import { Button, TextField } from '@/components/ui'
-import { LoginInputs, loginSchema } from '@/features/auth/schemas/login.schema'
+import { loginUserHandler } from '@/features/auth/handlers/loginUserHandler'
+import { LoginInputs, loginSchema } from '@/features/auth/schemas'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { SubmitHandler, useForm } from 'react-hook-form'
+import { useNavigate } from 'react-router-dom'
 
 export const Login = () => {
+  const navigate = useNavigate()
+
   const {
     register,
     handleSubmit,
@@ -12,21 +16,11 @@ export const Login = () => {
     resolver: zodResolver(loginSchema),
   })
 
-  const onSubmit: SubmitHandler<LoginInputs> = (values) => {
-    console.log(values)
-  }
-
-  const onOAuthLogin = async () => {
+  const onSubmit: SubmitHandler<LoginInputs> = async (values) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/auth/login/github`, {
-        method: 'GET',
-        credentials: 'include',
-        redirect: 'follow',
-      })
+      await loginUserHandler(values)
 
-      const data = await response.json()
-
-      window.location.href = data.url
+      navigate('/')
     } catch (error) {
       console.error(error)
     }
@@ -38,15 +32,11 @@ export const Login = () => {
         <h1 className="mb-4 text-center text-2xl font-semibold text-gray-500">Wishlist</h1>
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-          <TextField label="Username" type="text" {...register('username')} formError={errors.username} />
+          <TextField label="Email" type="text" {...register('email')} formError={errors.email} />
           <TextField label="Password" type="password" {...register('password')} formError={errors.password} />
 
-          <Button>Login</Button>
+          <Button type="submit">Login</Button>
         </form>
-        <hr className="my-8 grow" />
-        <div className="flex w-full flex-col items-center">
-          <Button onClick={() => onOAuthLogin()}>Login using Github</Button>
-        </div>
       </div>
     </main>
   )

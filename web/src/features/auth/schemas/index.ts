@@ -1,10 +1,10 @@
 import { z } from 'zod'
 
 export const loginSchema = z.object({
-  username: z
+  email: z
     .string()
-    .min(3, 'Username must contain at least 3 character(s)')
-    .max(150, 'Username must not exceed 150 character(s)'),
+    .min(3, 'Email must contain at least 3 character(s)')
+    .max(150, 'Email must not exceed 150 character(s)'),
   password: z
     .string()
     .min(6, 'Password must contain at least 6 character(s)')
