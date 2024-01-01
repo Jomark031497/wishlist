@@ -7,9 +7,13 @@ export const users = pgTable('users', {
     .$defaultFn(() => nanoid())
     .primaryKey()
     .notNull(),
-  email: varchar('email', { length: 255 }).notNull().unique(),
-  password: varchar('password', { length: 150 }).notNull(),
+  email: varchar('email', { length: 255 }).unique(),
+  password: varchar('password', { length: 150 }),
   fullName: varchar('full_name', { length: 255 }),
+  googleId: varchar('google_id').unique(),
+  githubId: varchar('github_id').unique(),
+  discordId: varchar('discord_id').unique(),
+  microsoftId: varchar('microsoft_id').unique(),
 })
 
 export type User = typeof users.$inferSelect // return type when queried

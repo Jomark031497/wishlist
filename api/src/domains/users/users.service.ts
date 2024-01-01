@@ -15,17 +15,34 @@ export const getUserById = async (id: User['id']) => {
 }
 
 export const getUserByEmail = async (email: User['email']) => {
+  if (!email) throw new ApiError(400, 'Please enter a valid email address')
   const query = await db.select().from(users).where(eq(users.email, email))
   return query[0]
 }
 
+export const getUserByGoogleId = async (id: User['googleId']) => {
+  if (!id) throw new ApiError(400, 'Google ID not found')
+  const query = await db.select().from(users).where(eq(users.googleId, id))
+  return query[0]
+}
+
+export const getUserByDiscordId = async (id: User['discordId']) => {
+  if (!id) throw new ApiError(400, 'Discord ID not found')
+  const query = await db.select().from(users).where(eq(users.discordId, id))
+  return query[0]
+}
+
 export const createUser = async (payload: NewUser) => {
+  if (!payload.email) throw new ApiError(400, 'Please enter a valid email address')
   const user = await getUserByEmail(payload.email)
   if (user) throw new ApiError(400, 'Email is already taken')
 
-  const hashedPassword = await hash(payload.password)
-
-  await db.insert(users).values({ ...payload, password: hashedPassword })
+  await db.insert(users).values({
+    ...payload,
+    ...(payload.password && {
+      password: await hash(payload.password),
+    }),
+  })
 
   return { success: true }
 }

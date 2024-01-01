@@ -40,7 +40,7 @@ async function main() {
   app.use(errorHandler)
 
   app.listen(PORT, () => {
-    logger.info(`Server running at http://localhost:${PORT}`)
+    logger.info(`Server running at ${process.env.API_URL}`)
   })
 }
 
