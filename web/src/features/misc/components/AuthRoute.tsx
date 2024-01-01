@@ -2,10 +2,9 @@ import { useAuth } from '@/features/auth/hooks/useAuth'
 import { Navigate, Outlet } from 'react-router-dom'
 
 export const AuthRoute = () => {
-  const { data: auth } = useAuth()
+  const { user } = useAuth()
 
-  if (auth) {
-    console.log('authenticated, navigating to home')
+  if (user) {
     return <Navigate to="/" replace />
   }
 

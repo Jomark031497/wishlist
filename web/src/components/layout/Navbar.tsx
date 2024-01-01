@@ -1,14 +1,18 @@
-import { logoutUserHandler } from '@/features/auth/handlers/logoutUserHandler'
+import { useAuth } from '@/features/auth/hooks/useAuth'
 import { NavLink } from 'react-router-dom'
 
 export const Navbar = () => {
-  const handleLogout = async () => {
-    try {
-      await logoutUserHandler()
+  const { handleLogout } = useAuth()
 
+  const onLogout = async () => {
+    try {
+      await handleLogout()
       window.location.reload()
     } catch (error) {
-      console.error(error)
+      if (error instanceof Error) {
+        console.error(error.message)
+      }
+      console.error('Something went wrong')
     }
   }
 
@@ -19,7 +23,7 @@ export const Navbar = () => {
         <NavLink to="/about">About</NavLink>
       </ul>
 
-      <button onClick={handleLogout}>Logout</button>
+      <button onClick={onLogout}>Logout</button>
     </header>
   )
 }
