@@ -4,8 +4,8 @@ import { LoginInputs, loginSchema } from '@/features/auth/schemas'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
-import { FaGithub, FaMicrosoft, FaDiscord, FaGoogle } from 'react-icons/fa'
-import { loginUserByOAuth } from '@/features/auth/handlers/loginUserByOAuth'
+import { FaMicrosoft, FaGoogle } from 'react-icons/fa'
+import { API_URL } from '@/constants'
 
 export const Login = () => {
   const navigate = useNavigate()
@@ -24,15 +24,6 @@ export const Login = () => {
     try {
       await handleLogin(values)
       navigate('/')
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
-  const loginWithOAuth = async (provider: string) => {
-    try {
-      const data = await loginUserByOAuth(provider)
-      console.log(data)
     } catch (error) {
       console.error(error)
     }
@@ -72,24 +63,19 @@ export const Login = () => {
         </div>
 
         <div className="flex flex-col gap-3 p-4">
-          <Button
-            onClick={() => loginWithOAuth('google')}
-            className="flex w-full items-center justify-center gap-2 border border-primary bg-white text-xs text-primary hover:bg-gray-100"
+          <a
+            href={`${API_URL}/api/auth/google`}
+            className="flex w-full items-center justify-center gap-2 rounded border border-primary bg-white p-2 text-xs text-primary hover:bg-gray-100"
           >
             <FaGoogle className="h-5 w-5" /> Login with Google
-          </Button>
+          </a>
 
-          <Button className="flex w-full items-center justify-center gap-2 border border-primary bg-white text-xs text-primary hover:bg-gray-100">
-            <FaGithub className="h-5 w-5" /> Login with Github
-          </Button>
-
-          <Button className="flex w-full items-center justify-center gap-2 border border-primary bg-white text-xs text-primary hover:bg-gray-100">
+          <a
+            href={`${API_URL}/api/auth/azure`}
+            className="flex w-full items-center justify-center gap-2 rounded border border-primary bg-white p-2 text-xs text-primary hover:bg-gray-100"
+          >
             <FaMicrosoft className="h-5 w-5" /> Login with Microsoft
-          </Button>
-
-          <Button className="flex w-full items-center justify-center gap-2 border border-primary bg-white text-xs text-primary hover:bg-gray-100">
-            <FaDiscord className="h-5 w-5" /> Login with Discord
-          </Button>
+          </a>
         </div>
       </div>
     </main>
