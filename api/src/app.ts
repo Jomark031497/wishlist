@@ -6,7 +6,6 @@ import expressSession from 'express-session'
 import memoryStore from 'memorystore'
 import passport from 'passport'
 import { initializePassport } from './passport.js'
-import { COOKIE_NAME, SECRET_KEY, __IS_PROD__ } from './constants.js'
 import { initializeRoutes } from './routes.js'
 
 async function main() {
@@ -26,15 +25,11 @@ async function main() {
 
   app.use(
     expressSession({
-      secret: SECRET_KEY,
-      name: COOKIE_NAME,
+      secret: <string>process.env.SECRET_KEY,
       resave: false,
       saveUninitialized: false,
       cookie: {
         maxAge: 86400000, // 1 day
-        httpOnly: true,
-        secure: __IS_PROD__,
-        sameSite: 'lax',
       },
       store: new MemoryStore({
         checkPeriod: 86400000,

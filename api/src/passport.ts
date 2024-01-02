@@ -3,8 +3,6 @@ import { createUser, getUserByEmail, getUserById } from './domains/users/users.s
 import { ApiError } from './utils/ApiError.js'
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20'
 import { OIDCStrategy } from 'passport-azure-ad'
-import { API_URL } from './constants.js'
-import { type User } from './domains/users/users.schema.js'
 
 export async function initializePassport(passport: PassportStatic) {
   passport.use(
@@ -12,7 +10,7 @@ export async function initializePassport(passport: PassportStatic) {
       {
         clientID: <string>process.env.GOOGLE_CLIENT_ID,
         clientSecret: <string>process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: `${API_URL}/api/auth/google/callback`,
+        callbackURL: `http://localhost:8080/api/auth/google/callback`,
         scope: ['profile', 'email'],
       },
       async (_accessToken, _refreshToken, profile, done) => {
@@ -20,9 +18,9 @@ export async function initializePassport(passport: PassportStatic) {
           const email = profile['_json']['email']
           if (!email) return done(new ApiError(400, 'Failed to receive email from Google. Please try again :('))
           const user = await getUserByEmail(email)
-
-          if (user) return done(null, user)
-
+          if (user) {
+            return done(null, user)
+          }
           const newUser = await createUser({
             name: profile.displayName,
             googleId: profile.id,
@@ -45,10 +43,11 @@ export async function initializePassport(passport: PassportStatic) {
       {
         clientID: <string>process.env.AZURE_CLIENT_ID,
         clientSecret: <string>process.env.AZURE_CLIENT_SECRET,
-        identityMetadata: <string>process.env.AZURE_IDENTITY_METADATA,
+        identityMetadata:
+          'https://login.microsoftonline.com/fe9f51f9-56b5-4661-8a63-51c84f4c29ab/v2.0/.well-known/openid-configuration',
         responseType: 'code',
         responseMode: 'form_post',
-        redirectUrl: `${API_URL}/api/auth/azure/callback`,
+        redirectUrl: 'http://localhost:8080/api/auth/azure/callback',
         passReqToCallback: true,
         allowHttpForRedirectUrl: true,
         scope: ['email', 'profile'],
@@ -57,9 +56,12 @@ export async function initializePassport(passport: PassportStatic) {
         try {
           const email = profile._json['email']
           if (!email) return done(new ApiError(400, 'Failed to receive email from Azure. Please try again :('))
+
           const user = await getUserByEmail(email)
 
-          if (user) return done(null, user)
+          if (user) {
+            return done(null, user)
+          }
 
           const newUser = await createUser({
             name: profile.displayName,
@@ -78,9 +80,8 @@ export async function initializePassport(passport: PassportStatic) {
     ),
   )
 
-  passport.serializeUser((unknownUser: unknown, done) => {
-    const user = unknownUser as User
-
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  passport.serializeUser((user: any, done) => {
     process.nextTick(() => {
       done(null, user.id)
     })
