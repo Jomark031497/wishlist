@@ -7,6 +7,7 @@ import memoryStore from 'memorystore'
 import passport from 'passport'
 import { initializePassport } from './passport.js'
 import { initializeRoutes } from './routes.js'
+import { __API_URL__, __CLIENT_URL__, __COOKIE_NAME__, __SECRET_KEY__ } from './constants.js'
 
 async function main() {
   const app = express()
@@ -15,7 +16,7 @@ async function main() {
 
   app.use(
     cors({
-      origin: <string>process.env.CLIENT_URL,
+      origin: __CLIENT_URL__,
       credentials: true,
     }),
   )
@@ -25,7 +26,8 @@ async function main() {
 
   app.use(
     expressSession({
-      secret: <string>process.env.SECRET_KEY,
+      name: __COOKIE_NAME__,
+      secret: __SECRET_KEY__,
       resave: false,
       saveUninitialized: false,
       cookie: {
@@ -48,7 +50,7 @@ async function main() {
   app.use(errorHandler)
 
   app.listen(PORT, () => {
-    logger.info(`Server running at ${process.env.API_URL}`)
+    logger.info(`Server running at ${__API_URL__}`)
   })
 }
 

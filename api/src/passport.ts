@@ -3,6 +3,7 @@ import { createUser, getUserByEmail, getUserById } from './domains/users/users.s
 import { ApiError } from './utils/ApiError.js'
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20'
 import { OIDCStrategy } from 'passport-azure-ad'
+import { __API_URL__ } from './constants.js'
 
 export async function initializePassport(passport: PassportStatic) {
   passport.use(
@@ -10,7 +11,7 @@ export async function initializePassport(passport: PassportStatic) {
       {
         clientID: <string>process.env.GOOGLE_CLIENT_ID,
         clientSecret: <string>process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: `http://localhost:8080/api/auth/google/callback`,
+        callbackURL: `${__API_URL__}/api/auth/google/callback`,
         scope: ['profile', 'email'],
       },
       async (_accessToken, _refreshToken, profile, done) => {
@@ -43,11 +44,10 @@ export async function initializePassport(passport: PassportStatic) {
       {
         clientID: <string>process.env.AZURE_CLIENT_ID,
         clientSecret: <string>process.env.AZURE_CLIENT_SECRET,
-        identityMetadata:
-          'https://login.microsoftonline.com/fe9f51f9-56b5-4661-8a63-51c84f4c29ab/v2.0/.well-known/openid-configuration',
+        identityMetadata: <string>process.env.AZURE_IDENTITY_METADATA,
         responseType: 'code',
         responseMode: 'form_post',
-        redirectUrl: 'http://localhost:8080/api/auth/azure/callback',
+        redirectUrl: `${__API_URL__}/api/auth/azure/callback`,
         passReqToCallback: true,
         allowHttpForRedirectUrl: true,
         scope: ['email', 'profile'],
