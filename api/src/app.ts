@@ -5,7 +5,7 @@ import cors from 'cors'
 import expressSession from 'express-session'
 import memoryStore from 'memorystore'
 import passport from 'passport'
-import { initializePassport } from './config/passport.js'
+import { initializePassport } from './passport.js'
 import { CLIENT_URL, SECRET_KEY, __IS_PROD__ } from './constants.js'
 import { initializeRoutes } from './routes.js'
 

@@ -1,10 +1,10 @@
 import { type PassportStatic } from 'passport'
-import { createUser, getUserByEmail, getUserById } from '../domains/users/users.service.js'
-import { ApiError } from '../utils/ApiError.js'
+import { createUser, getUserByEmail, getUserById } from './domains/users/users.service.js'
+import { ApiError } from './utils/ApiError.js'
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20'
 import { OIDCStrategy } from 'passport-azure-ad'
-import { API_URL } from '../constants.js'
-import { type User } from '../domains/users/users.schema.js'
+import { API_URL } from './constants.js'
+import { type User } from './domains/users/users.schema.js'
 
 export async function initializePassport(passport: PassportStatic) {
   passport.use(
