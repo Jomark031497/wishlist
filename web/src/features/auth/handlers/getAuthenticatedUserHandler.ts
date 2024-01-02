@@ -1,5 +1,7 @@
+import { API_URL } from '@/constants'
+
 export const getAuthenticatedUserHandler = async () => {
-  const url = new URL('http://localhost:8080/api/auth/user')
+  const url = new URL(`${API_URL}/api/auth/user`)
 
   const response = await fetch(url, {
     method: 'GET',
