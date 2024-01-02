@@ -1,46 +1,16 @@
 import { Router } from 'express'
-import passport from 'passport'
 import { requireAuth } from '../../middlewares/requireAuth.js'
+import * as authController from './auth.controller.js'
 
 const router = Router()
 
-router.get('/google', (req, res, next) => {
-  passport.authenticate('google')(req, res, next)
-})
+router.get('/google', authController.googleAuthHandler)
+router.get('/google/callback', authController.googleAuthCallbackHandler)
 
-router.get(
-  '/google/callback',
-  passport.authenticate('google', {
-    failureRedirect: `${process.env.CLIENT_URL}/login`,
-    successRedirect: process.env.CLIENT_URL,
-  }),
-)
+router.get('/azure', authController.azureAuthHandler)
+router.post('/azure/callback', authController.azureAuthCallbackHandler)
 
-router.get(
-  '/azure',
-  passport.authenticate('azuread-openidconnect', {
-    failureRedirect: `${process.env.CLIENT_URL}/login`,
-    successRedirect: process.env.CLIENT_URL,
-  }),
-)
-
-router.post('/azure/callback', (req, res, next) => {
-  passport.authenticate('azuread-openidconnect', {
-    failureRedirect: `${process.env.CLIENT_URL}/login`,
-    successRedirect: process.env.CLIENT_URL,
-  })(req, res, next)
-})
-
-router.get('/logout', function (req, res) {
-  req.session.destroy((err) => {
-    if (err) return res.redirect(`${process.env.CLIENT_URL}/login`)
-    res.clearCookie('sid')
-    res.redirect(`${process.env.CLIENT_URL}/login`)
-  })
-})
-
-router.get('/user', requireAuth, (req, res) => {
-  return res.json(req.user)
-})
+router.delete('/logout', requireAuth, authController.logoutHandler)
+router.get('/user', requireAuth, authController.getAuthenticatedUserHandler)
 
 export default router
