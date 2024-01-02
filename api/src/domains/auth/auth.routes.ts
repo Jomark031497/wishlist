@@ -8,6 +8,10 @@ router.get('/protected', requireAuth, (req, res) => {
   res.send({ accessible: true, user: req.user })
 })
 
+router.get('/google', (req, res, next) => {
+  passport.authenticate('google')(req, res, next)
+})
+
 router.get(
   '/google/callback',
   passport.authenticate('google', {
@@ -16,15 +20,26 @@ router.get(
   }),
 )
 
-router.get('/google', passport.authenticate('google'))
+router.get(
+  '/azure',
+  passport.authenticate('azuread-openidconnect', {
+    failureRedirect: `${process.env.CLIENT_URL}/login`,
+    successRedirect: process.env.CLIENT_URL,
+  }),
+)
 
-router.get('/azure', passport.authenticate('azuread-openidconnect', { failureRedirect: '/' }))
+router.post('/azure/callback', (req, res, next) => {
+  passport.authenticate('azuread-openidconnect', {
+    failureRedirect: `${process.env.CLIENT_URL}/login`,
+    successRedirect: process.env.CLIENT_URL,
+  })(req, res, next)
+})
 
 router.get('/logout', function (req, res) {
   req.session.destroy(function (err) {
-    if (err) return res.redirect('/')
+    if (err) return res.redirect(`${process.env.CLIENT_URL}/login`)
     res.clearCookie('sid')
-    res.redirect('/')
+    res.redirect(`${process.env.CLIENT_URL}/login`)
   })
 })
 

@@ -12,11 +12,6 @@ export async function getUserByEmail(email: string) {
   return query[0]
 }
 
-export async function getUserByProviderEmail(providerEmail: string, email: string) {
-  const query = await db.select().from(users).where(eq(users[providerEmail], email))
-  return query[0]
-}
-
 export async function createUser(payload: NewUser) {
   const query = await db
     .insert(users)
