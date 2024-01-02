@@ -13,12 +13,6 @@ export async function getUserByEmail(email: string) {
 }
 
 export async function createUser(payload: NewUser) {
-  const query = await db
-    .insert(users)
-    .values({
-      ...payload,
-    })
-    .returning()
-
+  const query = await db.insert(users).values(payload).returning()
   return query[0]
 }

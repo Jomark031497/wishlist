@@ -4,10 +4,6 @@ import { requireAuth } from '../../middlewares/requireAuth.js'
 
 const router = Router()
 
-router.get('/protected', requireAuth, (req, res) => {
-  res.send({ accessible: true, user: req.user })
-})
-
 router.get('/google', (req, res, next) => {
   passport.authenticate('google')(req, res, next)
 })
@@ -36,14 +32,14 @@ router.post('/azure/callback', (req, res, next) => {
 })
 
 router.get('/logout', function (req, res) {
-  req.session.destroy(function (err) {
+  req.session.destroy((err) => {
     if (err) return res.redirect(`${process.env.CLIENT_URL}/login`)
     res.clearCookie('sid')
     res.redirect(`${process.env.CLIENT_URL}/login`)
   })
 })
 
-router.get('/user', (req, res) => {
+router.get('/user', requireAuth, (req, res) => {
   return res.json(req.user)
 })
 

@@ -3,22 +3,20 @@ import { logger } from './utils/logger.js'
 import { errorHandler } from './middlewares/errorHandler.js'
 import cors from 'cors'
 import expressSession from 'express-session'
-// import memoryStore from 'memorystore'
+import memoryStore from 'memorystore'
 import passport from 'passport'
 import { initializePassport } from './config/passport.js'
-import authRoutes from './domains/auth/auth.routes.js'
+import { CLIENT_URL, SECRET_KEY, __IS_PROD__ } from './constants.js'
+import { initializeRoutes } from './routes.js'
 
 async function main() {
   const app = express()
   const PORT = process.env.PORT
-
-  // const MemoryStore = memoryStore(expressSession)
-
-  initializePassport(passport)
+  const MemoryStore = memoryStore(expressSession)
 
   app.use(
     cors({
-      origin: <string>process.env.CLIENT_URL,
+      origin: CLIENT_URL,
       credentials: true,
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     }),
@@ -29,29 +27,28 @@ async function main() {
 
   app.use(
     expressSession({
-      secret: <string>process.env.SECRET,
+      secret: SECRET_KEY,
       resave: false,
       saveUninitialized: false,
       cookie: {
-        maxAge: 86400000,
+        maxAge: 86400000, // 1 day
+        httpOnly: true,
+        secure: __IS_PROD__,
+        sameSite: 'lax',
       },
-      // store: new MemoryStore({
-      //   checkPeriod: 86400000,
-      // }),
+      store: new MemoryStore({
+        checkPeriod: 86400000,
+      }),
     }),
   )
+
+  initializePassport(passport)
 
   // Enable passport authentication, session and plug strategies
   app.use(passport.initialize())
   app.use(passport.session())
 
-  app.get('/', (req, res) =>
-    res.json({
-      message: 'Hello world!',
-      isAuthenticated: req.isAuthenticated(),
-    }),
-  )
-  app.use('/api/auth', authRoutes)
+  initializeRoutes(app)
 
   app.use(errorHandler)
 
