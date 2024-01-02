@@ -2,8 +2,9 @@ import { type PassportStatic } from 'passport'
 import { createUser, getUserByEmail, getUserById } from '../domains/users/users.service.js'
 import { ApiError } from '../utils/ApiError.js'
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20'
-import { logger } from '../utils/logger.js'
 import { OIDCStrategy } from 'passport-azure-ad'
+import { API_URL } from '../constants.js'
+import { type User } from '../domains/users/users.schema.js'
 
 export async function initializePassport(passport: PassportStatic) {
   passport.use(
@@ -11,28 +12,22 @@ export async function initializePassport(passport: PassportStatic) {
       {
         clientID: <string>process.env.GOOGLE_CLIENT_ID,
         clientSecret: <string>process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: 'http://localhost:8080/api/auth/google/callback',
+        callbackURL: `${API_URL}/api/auth/google/callback`,
         scope: ['profile', 'email'],
       },
-      async (accessToken, refreshToken, profile, done) => {
-        logger.info('Using Google Strategy...')
-
+      async (_accessToken, _refreshToken, profile, done) => {
         try {
           const email = profile['_json']['email']
           if (!email) return done(new ApiError(400, 'Failed to receive email from Google. Please try again :('))
           const user = await getUserByEmail(email)
-          if (user) {
-            logger.info('User is found. returning user...')
-            return done(null, user)
-          }
-          logger.info('User not found. creating user...')
+
+          if (user) return done(null, user)
+
           const newUser = await createUser({
             name: profile.displayName,
             googleId: profile.id,
             email,
           })
-
-          logger.info(user, 'user created. returning new user...')
 
           return done(null, newUser)
         } catch (error) {
@@ -50,36 +45,27 @@ export async function initializePassport(passport: PassportStatic) {
       {
         clientID: <string>process.env.AZURE_CLIENT_ID,
         clientSecret: <string>process.env.AZURE_CLIENT_SECRET,
-        identityMetadata:
-          'https://login.microsoftonline.com/fe9f51f9-56b5-4661-8a63-51c84f4c29ab/v2.0/.well-known/openid-configuration',
+        identityMetadata: <string>process.env.AZURE_IDENTITY_METADATA,
         responseType: 'code',
         responseMode: 'form_post',
-        redirectUrl: 'http://localhost:8080/api/auth/azure/callback',
+        redirectUrl: `${API_URL}/api/auth/azure/callback`,
         passReqToCallback: true,
         allowHttpForRedirectUrl: true,
         scope: ['email', 'profile'],
       },
-      async (req, iss, sub, profile, jwtClaims, accessToken, refresh_token, params, done) => {
+      async (_req, _iss, _sub, profile, _jwtClaims, _accessToken, _refresh_token, _params, done) => {
         try {
           const email = profile._json['email']
           if (!email) return done(new ApiError(400, 'Failed to receive email from Azure. Please try again :('))
-
           const user = await getUserByEmail(email)
 
-          if (user) {
-            logger.info('User is found. returning user...')
-            return done(null, user)
-          }
-
-          logger.info(profile, 'User not found. creating user...')
+          if (user) return done(null, user)
 
           const newUser = await createUser({
             name: profile.displayName,
             azureId: profile.oid,
             email,
           })
-
-          logger.info(user, 'user created. returning new user...')
 
           return done(null, newUser)
         } catch (error) {
@@ -92,17 +78,15 @@ export async function initializePassport(passport: PassportStatic) {
     ),
   )
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  passport.serializeUser((user: any, done) => {
-    logger.info(user, 'Serializing user...')
+  passport.serializeUser((unknownUser: unknown, done) => {
+    const user = unknownUser as User
+
     process.nextTick(() => {
       done(null, user.id)
     })
   })
 
   passport.deserializeUser((id: string, done) => {
-    logger.info(id, 'Deserializing user...')
-
     process.nextTick(async () => {
       const user = await getUserById(id)
       if (!user) return done(new ApiError(400, 'User not found'), false)
