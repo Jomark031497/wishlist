@@ -10,7 +10,7 @@ router.get('/google/callback', authController.googleAuthCallbackHandler)
 router.get('/azure', authController.azureAuthHandler)
 router.post('/azure/callback', authController.azureAuthCallbackHandler)
 
-router.delete('/logout', requireAuth, authController.logoutHandler)
 router.get('/user', requireAuth, authController.getAuthenticatedUserHandler)
+router.get('/logout', requireAuth, authController.logoutHandler)
 
 export default router

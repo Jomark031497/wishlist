@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from 'express'
 import passport from 'passport'
-import { COOKIE_NAME } from '../../constants.js'
+import { CLIENT_URL, COOKIE_NAME } from '../../constants.js'
 import { ApiError } from '../../utils/ApiError.js'
 
 export const getAuthenticatedUserHandler = (req: Request, res: Response, next: NextFunction) => {
@@ -13,7 +13,10 @@ export const getAuthenticatedUserHandler = (req: Request, res: Response, next: N
 
 export const googleAuthHandler = (req: Request, res: Response, next: NextFunction) => {
   try {
-    passport.authenticate('google')(req, res, next)
+    passport.authenticate('google', {
+      failureRedirect: `${CLIENT_URL}/login`,
+      successRedirect: CLIENT_URL,
+    })(req, res, next)
   } catch (error) {
     return next(error)
   }
@@ -21,8 +24,9 @@ export const googleAuthHandler = (req: Request, res: Response, next: NextFunctio
 
 export const googleAuthCallbackHandler = (req: Request, res: Response, next: NextFunction) => {
   try {
-    passport.authenticate('google', () => {
-      res.status(200).json({ success: true })
+    passport.authenticate('google', {
+      failureRedirect: `${CLIENT_URL}/login`,
+      successRedirect: CLIENT_URL,
     })(req, res, next)
   } catch (error) {
     return next(error)
@@ -31,7 +35,10 @@ export const googleAuthCallbackHandler = (req: Request, res: Response, next: Nex
 
 export const azureAuthHandler = (req: Request, res: Response, next: NextFunction) => {
   try {
-    passport.authenticate('azuread-openidconnect')(req, res, next)
+    passport.authenticate('azuread-openidconnect', {
+      failureRedirect: `${CLIENT_URL}/login`,
+      successRedirect: CLIENT_URL,
+    })(req, res, next)
   } catch (error) {
     return next(error)
   }
@@ -39,8 +46,9 @@ export const azureAuthHandler = (req: Request, res: Response, next: NextFunction
 
 export const azureAuthCallbackHandler = (req: Request, res: Response, next: NextFunction) => {
   try {
-    passport.authenticate('azuread-openidconnect', () => {
-      res.status(200).json({ success: true })
+    passport.authenticate('azuread-openidconnect', {
+      failureRedirect: `${CLIENT_URL}/login`,
+      successRedirect: CLIENT_URL,
     })(req, res, next)
   } catch (error) {
     return next(error)
@@ -52,7 +60,7 @@ export const logoutHandler = (req: Request, res: Response, next: NextFunction) =
     req.session.destroy((err) => {
       if (err) throw new ApiError(401, 'Unauthorized')
       res.clearCookie(COOKIE_NAME)
-      res.status(200).json({ success: true })
+      res.redirect(`${CLIENT_URL}/login`)
     })
   } catch (error) {
     return next(error)

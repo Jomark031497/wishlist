@@ -6,7 +6,7 @@ import expressSession from 'express-session'
 import memoryStore from 'memorystore'
 import passport from 'passport'
 import { initializePassport } from './passport.js'
-import { CLIENT_URL, SECRET_KEY, __IS_PROD__ } from './constants.js'
+import { CLIENT_URL, COOKIE_NAME, SECRET_KEY, __IS_PROD__ } from './constants.js'
 import { initializeRoutes } from './routes.js'
 
 async function main() {
@@ -28,6 +28,7 @@ async function main() {
   app.use(
     expressSession({
       secret: SECRET_KEY,
+      name: COOKIE_NAME,
       resave: false,
       saveUninitialized: false,
       cookie: {
