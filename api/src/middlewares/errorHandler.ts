@@ -4,6 +4,7 @@ import { logger } from '../utils/logger.js'
 
 export const errorHandler = (error: ApiError | Error, _req: Request, res: Response, next: NextFunction) => {
   if (!error) next()
+
   logger.error(error)
 
   if (error instanceof ApiError) {
