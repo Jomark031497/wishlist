@@ -7,7 +7,9 @@ export const users = pgTable('users', {
   email: varchar('email').unique(),
   accessToken: varchar('access_token'),
   googleId: varchar('google_id').unique(),
+  googleEmail: varchar('google_email'),
   azureId: varchar('azure_id').unique(),
+  azureEmail: varchar('azure_email'),
 })
 
 export type User = typeof users.$inferSelect // return type when queried

@@ -30,8 +30,8 @@ export const Login = () => {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center p-4 md:p-0">
-      <div className="max-w-sm grow rounded border">
+    <main className="flex min-h-screen items-center justify-center bg-gray-50 p-4 md:p-0">
+      <div className="max-w-sm grow rounded border bg-white shadow">
         <h1 className="my-4 text-center text-2xl font-semibold text-gray-500">Wishlist</h1>
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 p-4">

@@ -12,6 +12,16 @@ export async function getUserByEmail(email: string) {
   return query[0]
 }
 
+export async function getUserByGoogleEmail(googleEmail: string) {
+  const query = await db.select().from(users).where(eq(users.googleEmail, googleEmail))
+  return query[0]
+}
+
+export async function getUserByAzureEmail(azureEmail: string) {
+  const query = await db.select().from(users).where(eq(users.azureEmail, azureEmail))
+  return query[0]
+}
+
 export async function createUser(payload: NewUser) {
   const query = await db.insert(users).values(payload).returning()
   return query[0]
