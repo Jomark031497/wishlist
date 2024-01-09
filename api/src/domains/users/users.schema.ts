@@ -5,6 +5,7 @@ export const users = pgTable('users', {
   id: varchar('id').notNull().primaryKey().$defaultFn(nanoid),
   name: varchar('name', { length: 255 }),
   email: varchar('email').unique(),
+  password: varchar('password'),
   accessToken: varchar('access_token'),
   googleId: varchar('google_id').unique(),
   googleEmail: varchar('google_email'),
